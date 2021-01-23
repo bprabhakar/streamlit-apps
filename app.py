@@ -7,7 +7,6 @@ import torch
 import clip as clip
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model, preprocess = clip.load("ViT-B/32", device=device)
 
 st.markdown("# Zero Shot Image Classifier")
 st.markdown("""
@@ -27,6 +26,12 @@ You get the idea. Pick any image and any set of text labels and see the magic. B
 """)
 
 
+@st.cache(hash_funcs={dict: lambda _: None})
+def load_models():
+    model, preprocess = clip.load("ViT-B/32", device=device)
+    return {"model": model, "preprocess": preprocess}
+
+
 @st.cache
 def render_img_url(url, local=False):
     if not local:
@@ -38,6 +43,9 @@ def render_img_url(url, local=False):
 
 
 def predict(image, text_classes):
+    loader = load_models()
+    model = loader["model"]
+    preprocess = loader["preprocess"]
     image = preprocess(image).unsqueeze(0).to(device)
     text = clip.tokenize(text_classes).to(device)
     with torch.no_grad():
