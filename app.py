@@ -10,6 +10,21 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device)
 
 st.markdown("# Zero Shot Image Classifier")
+st.markdown("""
+How this works is simple. You enter the URL of an image and a list of text labels that you want to classify the image for.
+The model will then assign scores to each text label - probability that the given image matches that particular text label.
+
+So, for example if you entered an image of an animal, you could enter the following text labels: 
+
+`dog, cat, tiger, bear`
+
+Or, if you wanted to predict the color of a shoe, you could enter:
+
+`red, blue, black`
+
+You get the idea. Pick any image and any set of text labels and see the magic. Be creative!
+
+""")
 
 
 @st.cache
@@ -41,12 +56,8 @@ img_url = st.text_input('Enter the image URL')
 if img_url:
     image = render_img_url(img_url)
     st.image(image, use_column_width=True)
-    st.markdown("""
-Enter comma separated text classes below. For example if you wanted to classify a picture of an animal, you could enter: 
-
-`dog, cat, tiger, bear`
-""")
-    raw_text_labels = st.text_area("", value='', height=None, max_chars=None)
+    raw_text_labels = st.text_input(
+        "Enter comma separated text classes to predict:")
     if raw_text_labels:
         labels = [x.strip() for x in raw_text_labels.split(",")]
         preds = predict(image, labels)
