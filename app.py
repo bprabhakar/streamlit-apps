@@ -7,6 +7,10 @@ import boto3
 import botocore
 import math
 
+if st.session_state.get("all_classes") is None:
+    with open("all_classes.txt", "r") as f:
+        all_classes = f.readlines()
+    st.session_state["all_classes"] = [x.strip() for x in all_classes]
 
 def parse_lambda_response_payload(payload):
     if payload is not None:
@@ -111,6 +115,8 @@ def draw_bounding_box_on_image(
 # Visual App
 st.markdown("# ShopNet by mustard")
 st.markdown("""Detects clothes and their types in images.""")
+with st.beta_expander("Click to see all clothing types that are supported:"):
+    st.session_state["all_classes"]
 img_url = st.text_input("Enter the image URL")
 if img_url:
     image = Image.open(get_image(img_url))
